@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:context="http://www.springframework.org/schema/context"
+xsi:schemaLocation="
+http://www.springframework.org/schema/beans	      
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/context		   
+http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+<!-- id 表示你这个组件的名字，class表示组件类 -->
+<!--使用默认构造参数-->
+    <bean id="hello" class="com.ly.studyspring.HelloImpl"/>
+
+<!--使用有参数构造参数-->
+<bean id="hello2" class="com.ly.studyspring.HelloImpl2">
+	<!-- 指定构造器参数 -->
+	<constructor-arg index="0" value="Hello spring!"/>
+</bean>
+
+<!-- 使用静态工厂方法 -->
+<bean id="hello3" class="com.ly.studyspring.HelloApiStaticFactory" factory-method="newInstance">
+	<!-- 指定构造器参数 -->
+	<constructor-arg index="0" value="Hello spring factory!"/>
+</bean>
+
+    <!-- 使用实例工厂方法 -->
+    <bean id="beanInstanceFactory" class="com.ly.studyspring.HelloApiInstanceFactory"/>
+    <bean id="hello4" factory-bean="beanInstanceFactory" factory-method="newInstance">
+        <!--<constructor-arg index="0" value="Hello spring instance"/>-->
+        <!--<constructor-arg type="java.lang.String" value="Hello spring instance"/>-->
+        <!-- 确保编译时class文件包含“变量信息”-->
+        <!--@java.beans.ConstructorProperties({"message", "index"})注解可指定参数名字 测试发现不加也ok-->
+        <constructor-arg name="message" value="Hello spring instance"/>
+    </bean>
+
+    <!-- 使用Setter方法 -->
+    <bean id="hello5" class="com.ly.studyspring.HelloImpl4">
+        <!--<property name="index" value="1"/>-->
+        <property name="index">
+            <value>1</value>
+        </property>
+        <property name="message" value="hello setter"/>
+    </bean>
+</beans>
