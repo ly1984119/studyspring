@@ -1,4 +1,4 @@
-package com.ly.studyspring;
+package com.ly.studyspring.beanInit;
 
 public class HelloApiInstanceFactory {
     public HelloApi newInstance(String message){

@@ -1,5 +1,7 @@
 package com.ly.studyspring;
 
+import com.ly.studyspring.beanInit.HelloApi;
+import com.ly.studyspring.beanInit.HelloImpl2;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
