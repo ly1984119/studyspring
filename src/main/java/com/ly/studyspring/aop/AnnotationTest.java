@@ -49,6 +49,7 @@ public class AnnotationTest {
     @Around("sayings()")
     public void sayAround(ProceedingJoinPoint pjp) throws Throwable {
         System.out.println("注解类型环绕通知..环绕前");
+
         pjp.proceed();//执行方法
         System.out.println("注解类型环绕通知..环绕后");
     }
