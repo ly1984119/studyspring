@@ -22,6 +22,6 @@ public class TestAOP {
     @Test
     public void testSayHello() {
         BraveKnight br = (BraveKnight) context.getBean("knight");
-        br.saying();
+        br.saying("hahahah");
     }
 }

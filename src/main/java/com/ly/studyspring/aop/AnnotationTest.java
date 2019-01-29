@@ -1,8 +1,11 @@
 package com.ly.studyspring.aop;
 
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
+
+import java.lang.reflect.Modifier;
 
 /**
  * 注解方式声明aop
@@ -35,22 +38,44 @@ public class AnnotationTest {
      * </aop:config>
      */
     @Before("sayings()")
-    public void sayHello() {
-        System.out.println("注解类型前置通知");
+    public void sayHello(JoinPoint joinPoint) {
+        System.out.println("AOP拦截前。。。。");
+        System.out.println("目标方法名为:" + joinPoint.getSignature().getName());
+        System.out.println("目标方法所属类的简单类名:" + joinPoint.getSignature().getDeclaringType().getSimpleName());
+        System.out.println("目标方法所属类的类名:" + joinPoint.getSignature().getDeclaringTypeName());
+        System.out.println("目标方法声明类型:" + Modifier.toString(joinPoint.getSignature().getModifiers()));
+        //获取传入目标方法的参数
+        Object[] args = joinPoint.getArgs();
+        for (int i = 0; i < args.length; i++) {
+            System.out.println("第" + (i + 1) + "个参数为:" + args[i]);
+        }
+        System.out.println("被代理的对象:" + joinPoint.getTarget());
+        System.out.println("代理对象自己:" + joinPoint.getThis());
     }
 
     //后置通知
     @After("sayings()")
     public void sayGoodbey() {
-        System.out.println("注解类型后置通知");
+        System.out.println("AOP拦截后。。。。");
     }
 
     //环绕通知。注意要有ProceedingJoinPoint参数传入。
     @Around("sayings()")
     public void sayAround(ProceedingJoinPoint pjp) throws Throwable {
-        System.out.println("注解类型环绕通知..环绕前");
-
-        pjp.proceed();//执行方法
-        System.out.println("注解类型环绕通知..环绕后");
+        try {
+            //前置通知
+            System.out.println("目标方法执行前...");
+            //执行目标方法
+            //result = pjd.proeed();
+            //用新的参数值执行目标方法
+            pjp.proceed(new Object[]{"newSpring"});
+//            pjp.proceed();//执行方法
+        } catch (Throwable e) {
+            //异常通知
+            System.out.println("执行目标方法异常后...");
+            throw new RuntimeException(e);
+        }
+        //后置通知
+        System.out.println("目标方法执行后...");
     }
 }
