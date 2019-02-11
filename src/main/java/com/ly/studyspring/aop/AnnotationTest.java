@@ -5,6 +5,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 /**
@@ -19,7 +20,8 @@ import java.lang.reflect.Modifier;
 public class AnnotationTest {
 
     //定义切点
-    @Pointcut("execution(* *.saying(..))")
+//    @Pointcut("execution(* *.saying(..))")
+    @Pointcut("execution(* com.ly.studyspring.aop.*.*(..))")
     public void sayings() {
     }
 
@@ -39,15 +41,15 @@ public class AnnotationTest {
      */
     @Before("sayings()")
     public void sayHello(JoinPoint joinPoint) {
-        System.out.println("AOP拦截前。。。。");
-        System.out.println("目标方法名为:" + joinPoint.getSignature().getName());
-        System.out.println("目标方法所属类的简单类名:" + joinPoint.getSignature().getDeclaringType().getSimpleName());
-        System.out.println("目标方法所属类的类名:" + joinPoint.getSignature().getDeclaringTypeName());
-        System.out.println("目标方法声明类型:" + Modifier.toString(joinPoint.getSignature().getModifiers()));
+//        System.out.println("AOP拦截前。。。。");
+//        System.out.println("目标方法名为:" + joinPoint.getSignature().getName());
+//        System.out.println("目标方法所属类的简单类名:" + joinPoint.getSignature().getDeclaringType().getSimpleName());
+//        System.out.println("目标方法所属类的类名:" + joinPoint.getSignature().getDeclaringTypeName());
+//        System.out.println("目标方法声明类型:" + Modifier.toString(joinPoint.getSignature().getModifiers()));
         //获取传入目标方法的参数
         Object[] args = joinPoint.getArgs();
         for (int i = 0; i < args.length; i++) {
-            System.out.println("第" + (i + 1) + "个参数为:" + args[i]);
+//            System.out.println("第" + (i + 1) + "个参数为:" + args[i]);
         }
         System.out.println("被代理的对象:" + joinPoint.getTarget());
         System.out.println("代理对象自己:" + joinPoint.getThis());
@@ -70,6 +72,14 @@ public class AnnotationTest {
             //用新的参数值执行目标方法
             pjp.proceed(new Object[]{"newSpring"});
 //            pjp.proceed();//执行方法
+
+            Object obj = pjp.getTarget(); // 必须用target，不能是this
+            Method[] methods = obj.getClass().getMethods(); // 获取所有方法
+            for (Method item : methods) {
+                if (item.isAnnotationPresent(MyZhuJie.class)) {
+                    System.out.println("方法" + item.getName() + "加了注解");
+                }
+            }
         } catch (Throwable e) {
             //异常通知
             System.out.println("执行目标方法异常后...");
