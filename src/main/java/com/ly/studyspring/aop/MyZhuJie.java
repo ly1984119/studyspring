@@ -13,4 +13,6 @@ import java.lang.annotation.Target;
 public @interface MyZhuJie {
 
     boolean value() default true;
+
+    String btcpso() default "";
 }

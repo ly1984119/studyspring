@@ -1,6 +1,8 @@
 package com.ly.studyspring;
 
 import com.ly.studyspring.aop.BraveKnight;
+import com.ly.studyspring.aop.BraveKnight2;
+import com.ly.studyspring.aop.ParamObj;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
@@ -22,6 +24,13 @@ public class TestAOP {
     @Test
     public void testSayHello() {
         BraveKnight br = (BraveKnight) context.getBean("knight");
-        br.saying("hahahah");
+        ParamObj paramObj = new ParamObj("123456","haduka");
+        br.saying2(paramObj);
+//        br.saying2("test2222");
+
+//        BraveKnight2 br2 = (BraveKnight2) context.getBean("knight2");
+//        paramObj.setId("654321");
+//        paramObj.setName("jkiuyh");
+//        br2.saying(paramObj);
     }
 }

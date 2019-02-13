@@ -2,11 +2,19 @@ package com.ly.studyspring.aop;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.context.expression.MethodBasedEvaluationContext;
+import org.springframework.core.DefaultParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
 /**
  * 注解方式声明aop
@@ -17,7 +25,11 @@ import java.lang.reflect.Modifier;
  */
 @Component("annotationTest")
 @Aspect
-public class AnnotationTest {
+public class AnnotationAOP {
+
+    private static final ParameterNameDiscoverer NAME_DISCOVERER = new DefaultParameterNameDiscoverer();
+
+    private static final ExpressionParser PARSER = new SpelExpressionParser();
 
     //定义切点
 //    @Pointcut("execution(* *.saying(..))")
@@ -41,16 +53,12 @@ public class AnnotationTest {
      */
     @Before("sayings()")
     public void sayHello(JoinPoint joinPoint) {
-//        System.out.println("AOP拦截前。。。。");
+        System.out.println("AOP拦截前。。。。");
 //        System.out.println("目标方法名为:" + joinPoint.getSignature().getName());
 //        System.out.println("目标方法所属类的简单类名:" + joinPoint.getSignature().getDeclaringType().getSimpleName());
 //        System.out.println("目标方法所属类的类名:" + joinPoint.getSignature().getDeclaringTypeName());
 //        System.out.println("目标方法声明类型:" + Modifier.toString(joinPoint.getSignature().getModifiers()));
-        //获取传入目标方法的参数
-        Object[] args = joinPoint.getArgs();
-        for (int i = 0; i < args.length; i++) {
-//            System.out.println("第" + (i + 1) + "个参数为:" + args[i]);
-        }
+
         System.out.println("被代理的对象:" + joinPoint.getTarget());
         System.out.println("代理对象自己:" + joinPoint.getThis());
     }
@@ -66,19 +74,32 @@ public class AnnotationTest {
     public void sayAround(ProceedingJoinPoint pjp) throws Throwable {
         try {
             //前置通知
-            System.out.println("目标方法执行前...");
+            System.out.println("目标方法执行开始...");
             //执行目标方法
             //result = pjd.proeed();
             //用新的参数值执行目标方法
-            pjp.proceed(new Object[]{"newSpring"});
+//            pjp.proceed(new Object[]{"newSpring"});
 //            pjp.proceed();//执行方法
 
-            Object obj = pjp.getTarget(); // 必须用target，不能是this
-            Method[] methods = obj.getClass().getMethods(); // 获取所有方法
-            for (Method item : methods) {
-                if (item.isAnnotationPresent(MyZhuJie.class)) {
-                    System.out.println("方法" + item.getName() + "加了注解");
-                }
+//            Object obj = pjp.getTarget(); // 必须用target，不能是this
+//            Method[] methods = obj.getClass().getMethods(); // 获取所有方法
+//
+//            for (Method item : methods) {
+//                if (item.isAnnotationPresent(MyZhuJie.class)) {
+//                    MyZhuJie lock4j = item.getAnnotation(MyZhuJie.class);
+//                    String objValue = this.getZhujieObjValue(item, pjp, lock4j);
+//                    System.out.println("方法" + item.getName() + "加了注解，参数值：" + objValue);
+//                }
+//            }
+
+            // 获取当前目标方法
+            Signature signature = pjp.getSignature();
+            MethodSignature methodSignature = (MethodSignature)signature;
+            Method targetMethod = methodSignature.getMethod();
+            if (targetMethod.isAnnotationPresent(MyZhuJie.class)) {
+                MyZhuJie lock4j = targetMethod.getAnnotation(MyZhuJie.class);
+                String objValue = this.getZhujieObjValue(targetMethod, pjp, lock4j);
+                System.out.println("方法" + targetMethod.getName() + "加了注解，参数值：" + objValue);
             }
         } catch (Throwable e) {
             //异常通知
@@ -86,6 +107,14 @@ public class AnnotationTest {
             throw new RuntimeException(e);
         }
         //后置通知
-        System.out.println("目标方法执行后...");
+        System.out.println("目标方法执行结束...");
+    }
+
+    private String getZhujieObjValue(Method method, ProceedingJoinPoint pjp, MyZhuJie lock4j) {
+        String definitionKey = lock4j.btcpso();
+        EvaluationContext context = new MethodBasedEvaluationContext(null, method, pjp.getArgs(), NAME_DISCOVERER);
+        Expression expression = PARSER.parseExpression(definitionKey);
+        String value = expression.getValue(context).toString();
+        return value;
     }
 }
