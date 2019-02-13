@@ -27,10 +27,6 @@ import java.lang.reflect.Method;
 @Aspect
 public class AnnotationAOP {
 
-    private static final ParameterNameDiscoverer NAME_DISCOVERER = new DefaultParameterNameDiscoverer();
-
-    private static final ExpressionParser PARSER = new SpelExpressionParser();
-
     //定义切点
 //    @Pointcut("execution(* *.saying(..))")
     @Pointcut("execution(* com.ly.studyspring.aop.*.*(..))")
@@ -71,15 +67,14 @@ public class AnnotationAOP {
 
     //环绕通知。注意要有ProceedingJoinPoint参数传入。
     @Around("sayings()")
-    public void sayAround(ProceedingJoinPoint pjp) throws Throwable {
+    public Object sayAround(ProceedingJoinPoint pjp) throws Throwable {
         try {
             //前置通知
             System.out.println("目标方法执行开始...");
             //执行目标方法
-            //result = pjd.proeed();
             //用新的参数值执行目标方法
 //            pjp.proceed(new Object[]{"newSpring"});
-//            pjp.proceed();//执行方法
+            Object result = pjp.proceed();//执行方法
 
 //            Object obj = pjp.getTarget(); // 必须用target，不能是this
 //            Method[] methods = obj.getClass().getMethods(); // 获取所有方法
@@ -94,27 +89,33 @@ public class AnnotationAOP {
 
             // 获取当前目标方法
             Signature signature = pjp.getSignature();
-            MethodSignature methodSignature = (MethodSignature)signature;
+            MethodSignature methodSignature = (MethodSignature) signature;
             Method targetMethod = methodSignature.getMethod();
             if (targetMethod.isAnnotationPresent(MyZhuJie.class)) {
                 MyZhuJie lock4j = targetMethod.getAnnotation(MyZhuJie.class);
                 String objValue = this.getZhujieObjValue(targetMethod, pjp, lock4j);
                 System.out.println("方法" + targetMethod.getName() + "加了注解，参数值：" + objValue);
             }
+            //后置通知
+            System.out.println("目标方法执行结束...");
+            return result;
         } catch (Throwable e) {
             //异常通知
             System.out.println("执行目标方法异常后...");
             throw new RuntimeException(e);
         }
-        //后置通知
-        System.out.println("目标方法执行结束...");
     }
 
     private String getZhujieObjValue(Method method, ProceedingJoinPoint pjp, MyZhuJie lock4j) {
+        Object[] objects = pjp.getArgs();
+        if (objects[0] instanceof String) {
+            return String.valueOf((objects[0]));
+        }
         String definitionKey = lock4j.btcpso();
+        ParameterNameDiscoverer NAME_DISCOVERER = new DefaultParameterNameDiscoverer();
         EvaluationContext context = new MethodBasedEvaluationContext(null, method, pjp.getArgs(), NAME_DISCOVERER);
+        ExpressionParser PARSER = new SpelExpressionParser();
         Expression expression = PARSER.parseExpression(definitionKey);
-        String value = expression.getValue(context).toString();
-        return value;
+        return expression.getValue(context).toString();
     }
 }

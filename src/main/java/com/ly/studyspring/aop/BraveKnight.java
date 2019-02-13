@@ -18,7 +18,7 @@ public class BraveKnight {
         System.out.println("我是骑士..（切点方法）" + paramObj.getName());
     }
 
-    @MyZhuJie(value = false, btcpso = "str")
+    @MyZhuJie(value = false)
     public void saying3(String str){
         System.out.println( "我是骑士..（切点方法）" + str);
     }

@@ -25,8 +25,8 @@ public class TestAOP {
     public void testSayHello() {
         BraveKnight br = (BraveKnight) context.getBean("knight");
         ParamObj paramObj = new ParamObj("123456","haduka");
-        br.saying2(paramObj);
-//        br.saying2("test2222");
+//        br.saying2(paramObj);
+        br.saying3("test2222");
 
 //        BraveKnight2 br2 = (BraveKnight2) context.getBean("knight2");
 //        paramObj.setId("654321");
